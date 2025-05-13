@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 
-export default function MonthlyReportTable({ classId, selectedMonth }) {
+export default function MonthlyReportTable({
+  classId,
+  selectedMonth,
+  setData,
+}) {
   const [reportData, setReportData] = useState([]);
 
   useEffect(() => {
@@ -58,10 +62,13 @@ export default function MonthlyReportTable({ classId, selectedMonth }) {
       }));
 
       setReportData(tableData);
+
+      // Pass the data to parent component for CSV export
+      setData(tableData);
     };
 
     fetchData();
-  }, [classId, selectedMonth]);
+  }, [classId, selectedMonth, setData]);
 
   return (
     <table className="w-full border mt-4">
@@ -82,6 +89,13 @@ export default function MonthlyReportTable({ classId, selectedMonth }) {
             <td className="p-2">{s.Excused}</td>
           </tr>
         ))}
+        {reportData.length === 0 && (
+          <tr>
+            <td className="p-2 text-gray-500" colSpan="4">
+              Tidak ada data untuk bulan yang dipilih
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );

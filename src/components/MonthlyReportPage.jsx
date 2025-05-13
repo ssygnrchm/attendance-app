@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MonthSelector from "./reports/MonthSelector";
 import ClassSelector from "./students/ClassSelector";
 import MonthlyReportTable from "./reports/MonthlyReportTable";
@@ -8,6 +8,12 @@ export default function MonthlyReportPage() {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedClassId, setSelectedClassId] = useState("");
   const [reportData, setReportData] = useState([]);
+  const [showExport, setShowExport] = useState(false);
+
+  // Effect to check if we have data to show the export button
+  useEffect(() => {
+    setShowExport(reportData.length > 0);
+  }, [reportData]);
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -25,7 +31,7 @@ export default function MonthlyReportPage() {
         selectedMonth={selectedMonth}
         setData={setReportData}
       />
-      {reportData.length > 0 && (
+      {showExport && (
         <ExportCSVButton data={reportData} month={selectedMonth} />
       )}
     </div>
