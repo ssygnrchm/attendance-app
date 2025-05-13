@@ -1,39 +1,31 @@
 // src/components/AddClassForm.jsx
 import { useState } from "react";
-import { db } from "../firebase/firebase";
+import { db } from "../../firebase/firebase";
 import { collection, addDoc } from "firebase/firestore";
 
 export default function AddClassForm({ onClassAdded }) {
   const [name, setName] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
     if (!name.trim()) return;
 
-    const docRef = await addDoc(collection(db, "classes"), { name });
-    onClassAdded(); // refresh list
-    setName("");
-  };
-
-  // Let's say you have a form or a button to add a new attendee
-  async function addNewAttendee(name) {
     try {
-      // Get a reference to the 'attendees' collection
+      // Add document to Firestore
       const docRef = await addDoc(collection(db, "classes"), {
-        name: name,
+        name: name.toUpperCase(),
       });
 
       console.log("Document written with ID: ", docRef.id);
-      onClassAdded(); // refresh list
-      setName("");
-      // You can do something with docRef.id here, maybe update your UI
-    } catch (e) {
-      console.error("Error adding document: ", e);
+      onClassAdded(); // Refresh class list
+      setName(""); // Reset input field
+    } catch (error) {
+      console.error("Error adding class:", error);
     }
-  }
+  };
 
   return (
-    <form onSubmit={addNewAttendee} className="flex gap-2 mb-4">
+    <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
       <input
         type="text"
         value={name}
