@@ -6,15 +6,23 @@ export default function AddStudentForm({ classId, onStudentAdded }) {
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
 
+  function toPascalCase(str) {
+    return str
+      .toLowerCase()
+      .split(/[\s_\-]+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !gender) return alert("Nama dan jenis kelamin harus diisi.");
 
     try {
       await addDoc(collection(db, "students"), {
-        name,
-        gender,
-        classId,
+        name: toPascalCase(name),
+        gender: gender,
+        classId: classId,
       });
       setName("");
       setGender("");
