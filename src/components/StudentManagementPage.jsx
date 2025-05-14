@@ -4,7 +4,7 @@ import StudentList from "./students/StudentList";
 import AddStudentForm from "./students/AddStudentForm";
 
 export default function StudentManagementPage() {
-  const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedClassIds, setSelectedClassIds] = useState("");
   const [refreshToggle, setRefreshToggle] = useState(false);
 
   const handleRefresh = () => setRefreshToggle((prev) => !prev);
@@ -13,14 +13,16 @@ export default function StudentManagementPage() {
     <div className="p-4 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Manajemen Siswa</h1>
       <ClassSelector
-        selectedClassId={selectedClassId}
-        onChange={setSelectedClassId}
+        selectedClassId={selectedClassIds} // array
+        onChange={setSelectedClassIds}
+        multiple={true}
       />
+      {/* Hanya bisa menambahkan student jika kelas yang dipilih hanya 1 */}
       <AddStudentForm
         classId={selectedClassId}
         onStudentAdded={handleRefresh}
       />
-      <StudentList classId={selectedClassId} key={refreshToggle} />
+      <StudentList classId={selectedClassIds} key={refreshToggle} />
     </div>
   );
 }
