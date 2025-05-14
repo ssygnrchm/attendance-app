@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import StudentRow from "./StudentRow";
 
@@ -10,11 +17,24 @@ export default function AttendanceGrid({
   setAttendance,
 }) {
   const [students, setStudents] = useState([]);
+  const [className, setClassName] = useState("");
 
   useEffect(() => {
     if (!classId) return;
 
-    const fetchStudents = async () => {
+    const fetchData = async () => {
+      // Fetch class name
+      try {
+        const classDocRef = doc(db, "classes", classId);
+        const classDocSnap = await getDoc(classDocRef);
+        if (classDocSnap.exists()) {
+          setClassName(classDocSnap.data().name);
+        }
+      } catch (error) {
+        console.error("Error fetching class details:", error);
+      }
+
+      // Fetch students
       const q = query(
         collection(db, "students"),
         where("classId", "==", classId)
@@ -31,7 +51,7 @@ export default function AttendanceGrid({
       setAttendance(defaultAttendance);
     };
 
-    fetchStudents();
+    fetchData();
   }, [classId, selectedDate]);
 
   const handleStatusChange = (studentId, newStatus) => {
@@ -44,23 +64,29 @@ export default function AttendanceGrid({
   if (!classId || !selectedDate) return null;
 
   return (
-    <table className="w-full text-left border">
-      <thead>
-        <tr className="bg-gray-100">
-          <th className="p-2">Nama</th>
-          <th className="p-2">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {students.map((student) => (
-          <StudentRow
-            key={student.id}
-            student={student}
-            status={attendance[student.id] || "Present"}
-            onStatusChange={handleStatusChange}
-          />
-        ))}
-      </tbody>
-    </table>
+    <div>
+      <h3 className="text-lg font-medium mb-3">
+        Kelas: {className || classId}
+      </h3>
+      <table className="w-full text-left border">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="p-2">Nama</th>
+            <th className="p-2">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => (
+            <StudentRow
+              key={student.id}
+              student={student}
+              status={attendance[student.id] || "Present"}
+              onStatusChange={handleStatusChange}
+              className={className}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

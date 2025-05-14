@@ -6,7 +6,7 @@ import ExportCSVButton from "./reports/ExportCSVButton";
 
 export default function MonthlyReportPage() {
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedClassId, setSelectedClassId] = useState("");
+  const [selectedClassIds, setSelectedClassIds] = useState([]);
   const [reportData, setReportData] = useState([]);
   const [showExport, setShowExport] = useState(false);
 
@@ -23,11 +23,12 @@ export default function MonthlyReportPage() {
         onChange={setSelectedMonth}
       />
       <ClassSelector
-        selectedClassId={selectedClassId}
-        onChange={setSelectedClassId}
+        selectedClassId={selectedClassIds}
+        onChange={setSelectedClassIds}
+        multiple={true}
       />
       <MonthlyReportTable
-        classId={selectedClassId}
+        classIds={selectedClassIds}
         selectedMonth={selectedMonth}
         setData={setReportData}
       />

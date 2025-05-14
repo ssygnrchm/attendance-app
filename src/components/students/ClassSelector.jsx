@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
+import { ChevronDown } from "lucide-react";
 
 export default function ClassSelector({
   selectedClassId,
   onChange,
-  multiple = false, // default: single select
+  multiple = false,
 }) {
   const [classes, setClasses] = useState([]);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -22,35 +25,114 @@ export default function ClassSelector({
     fetchClasses();
   }, []);
 
-  const handleChange = (e) => {
-    if (multiple) {
-      const selectedOptions = Array.from(e.target.selectedOptions).map(
-        (option) => option.value
-      );
-      onChange(selectedOptions); // array of selected class IDs
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const toggleDropdown = () => setOpen((prev) => !prev);
+
+  const handleSelectAll = () => {
+    if (selectedClassId.length === classes.length) {
+      onChange([]);
     } else {
-      onChange(e.target.value); // single selected class ID
+      onChange(classes.map((cls) => cls.id));
+    }
+  };
+
+  const handleCheckboxChange = (id) => {
+    const current = selectedClassId || [];
+    if (current.includes(id)) {
+      onChange(current.filter((clsId) => clsId !== id));
+    } else {
+      onChange([...current, id]);
+    }
+  };
+
+  const handleSingleSelect = (id) => {
+    onChange(id);
+    setOpen(false);
+  };
+
+  const renderLabel = () => {
+    if (multiple) {
+      if (!selectedClassId || selectedClassId.length === 0)
+        return "Pilih Kelas";
+      const selectedNames = classes
+        .filter((cls) => selectedClassId.includes(cls.id))
+        .map((cls) => cls.name);
+      return selectedNames.join(", ");
+    } else {
+      const selected = classes.find((cls) => cls.id === selectedClassId);
+      return selected ? selected.name : "Pilih Kelas";
     }
   };
 
   return (
-    <div className="mb-4">
+    <div ref={dropdownRef} className="relative mb-4">
       <label className="block mb-1 text-sm font-medium text-gray-700">
-        Pilih Kelas
+        Kelas
       </label>
-      <select
-        multiple={multiple}
-        value={selectedClassId}
-        onChange={handleChange}
-        className="w-full border border-gray-300 p-2 rounded h-32"
+      <button
+        type="button"
+        onClick={toggleDropdown}
+        className="w-full flex justify-between items-center border border-gray-300 rounded px-3 py-2 bg-white hover:bg-gray-50"
       >
-        {!multiple && <option value="">-- Pilih Kelas --</option>}
-        {classes.map((cls) => (
-          <option key={cls.id} value={cls.id}>
-            {cls.name}
-          </option>
-        ))}
-      </select>
+        <span className="text-sm text-gray-700">{renderLabel()}</span>
+        <ChevronDown className="w-4 h-4 text-gray-500" />
+      </button>
+
+      {open && (
+        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-64 overflow-y-auto">
+          {multiple ? (
+            <div className="p-2">
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="text-sm text-blue-600 underline mb-2"
+              >
+                {selectedClassId.length === classes.length
+                  ? "Hapus Semua"
+                  : "Pilih Semua"}
+              </button>
+              {classes.map((cls) => (
+                <label
+                  key={cls.id}
+                  className="block text-sm px-2 py-1 cursor-pointer hover:bg-gray-100 rounded"
+                >
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={selectedClassId.includes(cls.id)}
+                    onChange={() => handleCheckboxChange(cls.id)}
+                  />
+                  {cls.name}
+                </label>
+              ))}
+            </div>
+          ) : (
+            <div className="p-2">
+              {classes.map((cls) => (
+                <div
+                  key={cls.id}
+                  className="text-sm px-2 py-1 cursor-pointer hover:bg-gray-100 rounded"
+                  onClick={() => handleSingleSelect(cls.id)}
+                >
+                  {cls.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

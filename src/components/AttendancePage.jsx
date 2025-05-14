@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ClassSelector from "./students/ClassSelector";
-import DateSelector from "./attendances/DataSelector";
+import DateSelector from "./attendances/DateSelector";
 import AttendanceGrid from "./attendances/AttendanceGrid";
 import SaveAttendanceButton from "./attendances/SaveAttendanceButton";
 

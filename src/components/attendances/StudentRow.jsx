@@ -1,7 +1,17 @@
-export default function StudentRow({ student, status, onStatusChange }) {
+export default function StudentRow({
+  student,
+  status,
+  onStatusChange,
+  className,
+}) {
   return (
     <tr className="border-t">
-      <td className="p-2">{student.name}</td>
+      <td className="p-2">
+        {student.name}
+        {className && (
+          <span className="text-xs text-gray-500 ml-2">({className})</span>
+        )}
+      </td>
       <td className="p-2">
         <select
           value={status}
