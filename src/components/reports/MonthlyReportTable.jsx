@@ -21,13 +21,19 @@ export default function MonthlyReportTable({
     if (!selectedMonth || !classIds || classIds.length === 0) return;
 
     const fetchData = async () => {
+      // Variable to store class names
+      let classNamesMap = {};
+
       // First fetch all class names
       try {
+        console.log("Fetching class names from Firestore...");
         const classesSnapshot = await getDocs(collection(db, "classes"));
-        const classNamesMap = {};
+
         classesSnapshot.docs.forEach((doc) => {
           classNamesMap[doc.id] = doc.data().name;
         });
+
+        console.log("Class names retrieved:", classNamesMap);
         setClassNames(classNamesMap);
       } catch (error) {
         console.error("Error fetching class names:", error);
@@ -77,22 +83,41 @@ export default function MonthlyReportTable({
           const studentDocRef = doc(db, "students", studentId);
           const studentDoc = await getDoc(studentDocRef);
           if (studentDoc.exists()) {
+            const studentInfo = studentDoc.data();
             studentData[studentId] = {
-              name: studentDoc.data().name,
-              classId: studentDoc.data().classId,
+              name: studentInfo.name,
+              classId: studentInfo.classId,
             };
+            console.log(
+              `Student ${studentId} belongs to class: ${studentInfo.classId}`
+            );
           }
         } catch (error) {
           console.error(`Error fetching student ${studentId}:`, error);
         }
       }
 
-      const tableData = studentIds.map((id) => ({
-        id,
-        name: studentData[id]?.name || "Tidak diketahui",
-        classNames: classNames[studentData[id]?.classId] || "Tidak diketahui",
-        ...studentStats[id],
-      }));
+      // Use the class names we fetched above, not the state variable which might not be updated yet
+      const tableData = studentIds.map((id) => {
+        // Use the classId from studentData if available, otherwise fall back to the one from attendance record
+        const studentClassId =
+          studentData[id]?.classId || studentStats[id].classId;
+        const className = classNamesMap[studentClassId];
+
+        console.log(
+          `Student ${id}: classId=${studentClassId}, className=${
+            className || "Not found"
+          }`
+        );
+
+        return {
+          id,
+          name: studentData[id]?.name || "Tidak diketahui",
+          classId: studentClassId,
+          className: className || "Tidak diketahui",
+          ...studentStats[id],
+        };
+      });
 
       setReportData(tableData);
 
@@ -118,7 +143,7 @@ export default function MonthlyReportTable({
         {reportData.map((s) => (
           <tr key={s.id} className="border-t">
             <td className="p-2">{s.name}</td>
-            <td className="p-2">{s.classNames}</td>
+            <td className="p-2">{s.className}</td>
             <td className="p-2">{s.Present}</td>
             <td className="p-2">{s.Absent}</td>
             <td className="p-2">{s.Excused}</td>
