@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Trash2, Pencil } from "lucide-react";
 import {
   collection,
   query,
@@ -7,6 +8,7 @@ import {
   orderBy,
   doc,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 
@@ -85,6 +87,41 @@ export default function StudentList({ classIds }) {
     }
   };
 
+  const handleEdit = async (
+    studentId,
+    studentName,
+    studentGender,
+    studentClass
+  ) => {
+    e.preventDefault();
+    if (!studentName || !studentGender || !studentClass)
+      return alert("Nama, jenis kelamin, dan kelas harus diisi.");
+
+    try {
+      const studentRef = doc(db, "students", studentId); // gunakan ID siswa yang akan diupdate
+      const qClass = query(
+        collection(db, "classes"),
+        where("name", "==", studentClass)
+      );
+      const querySnapshot = await getDocs(qClass);
+
+      const classRef = querySnapshot.docs[0];
+
+      await updateDoc(studentRef, {
+        name: toPascalCase(studentName),
+        gender: studentGender,
+        classId: classRef.classId,
+      });
+
+      // setName("");
+      // setGender("");
+      // onStudentUpdated(); // panggil fungsi refresh list atau tutup form
+    } catch (err) {
+      console.error("Gagal memperbarui siswa:", err);
+      alert("Terjadi kesalahan saat memperbarui data siswa.");
+    }
+  };
+
   useEffect(() => {
     fetchStudents();
   }, [classIds]);
@@ -115,10 +152,26 @@ export default function StudentList({ classIds }) {
               <td className="p-2 border">{student.className}</td>
               <td className="p-2 border">
                 <button
-                  onClick={() => handleDelete(student.id, student.name)}
-                  className="text-sm text-red-600 hover:underline"
+                  // onClick={() =>
+                  //   handleEdit(
+                  //     student.id,
+                  //     student.name,
+                  //     student.gender,
+                  //     student.className
+                  //   )
+                  // } // ganti sesuai fungsi edit kamu
+                  className="text-blue-600 hover:text-blue-800"
+                  title="Edit"
                 >
-                  Hapus
+                  <Pencil size={18} />
+                </button>
+
+                <button
+                  onClick={() => handleDelete(student.id, student.name)}
+                  className="text-red-600 hover:text-red-800"
+                  title="Hapus"
+                >
+                  <Trash2 size={18} />
                 </button>
               </td>
             </tr>

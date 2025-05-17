@@ -24,6 +24,7 @@ export default function StudentItem({ id, name, gender, className, onDelete }) {
           <span className="text-sm text-blue-500 ml-2">Kelas: {className}</span>
         )}
       </span>
+      <button className="text-sm text-red-600 hover:underline">Edit</button>
       <button
         onClick={handleDelete}
         className="text-sm text-red-600 hover:underline"
