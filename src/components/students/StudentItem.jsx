@@ -1,5 +1,5 @@
 import { doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 
 export default function StudentItem({ id, name, gender, className, onDelete }) {
   const handleDelete = async () => {

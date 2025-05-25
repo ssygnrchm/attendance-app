@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 
 export default function AddStudentForm({ classId, onStudentAdded }) {
   const [name, setName] = useState("");

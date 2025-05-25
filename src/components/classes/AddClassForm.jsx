@@ -1,6 +1,6 @@
 // src/components/AddClassForm.jsx
 import { useState } from "react";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 import { collection, addDoc } from "firebase/firestore";
 
 export default function AddClassForm({ onClassAdded }) {

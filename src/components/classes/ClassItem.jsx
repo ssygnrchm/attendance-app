@@ -1,6 +1,6 @@
 // src/components/ClassItem.jsx
 import { doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 
 export default function ClassItem({ id, name, onDelete }) {
   const handleDelete = async () => {

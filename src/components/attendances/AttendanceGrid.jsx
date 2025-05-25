@@ -7,7 +7,7 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 import StudentRow from "./StudentRow";
 
 export default function AttendanceGrid({

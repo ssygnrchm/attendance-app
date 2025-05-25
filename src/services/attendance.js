@@ -1,12 +1,7 @@
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../services/firebase";
+import { setDoc } from "firebase/firestore";
+import { db } from "./firebase";
 
-export default function SaveAttendanceButton({
-  selectedDate,
-  classId,
-  attendance,
-}) {
-  const handleSave = async () => {
+const handleSave = async (selectedDate, classId, attendance) => {
     if (!selectedDate || !classId)
       return alert("Tanggal dan kelas harus dipilih");
 
@@ -28,13 +23,3 @@ export default function SaveAttendanceButton({
       alert("Terjadi kesalahan saat menyimpan.");
     }
   };
-
-  return (
-    <button
-      onClick={handleSave}
-      className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-    >
-      Simpan Absensi
-    </button>
-  );
-}

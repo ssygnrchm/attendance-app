@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { db } from "../firebase/firebase";
+import { db } from "../services/firebase";
 
 const FirebaseContext = createContext(null);
 

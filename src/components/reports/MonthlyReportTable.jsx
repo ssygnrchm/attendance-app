@@ -7,7 +7,7 @@ import {
   getDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 
 export default function MonthlyReportTable({
   classIds,

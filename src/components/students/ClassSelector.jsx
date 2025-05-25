@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../services/firebase";
 import { ChevronDown } from "lucide-react";
 
 export default function ClassSelector({
