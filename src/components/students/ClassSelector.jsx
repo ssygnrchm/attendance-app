@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../../services/firebase";
-import { ChevronDown } from "lucide-react";
+import { BookOpen, X } from "lucide-react";
 
 export default function ClassSelector({
   selectedClassId,
@@ -10,7 +10,8 @@ export default function ClassSelector({
 }) {
   const [classes, setClasses] = useState([]);
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const containerRef = useRef(null);
+  //const buttonRef = useRef(null); // 🔥 ref untuk tombol
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -25,10 +26,12 @@ export default function ClassSelector({
     fetchClasses();
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
         setOpen(false);
       }
     };
@@ -38,99 +41,67 @@ export default function ClassSelector({
     };
   }, []);
 
-  const toggleDropdown = () => setOpen((prev) => !prev);
-
-  const handleSelectAll = () => {
-    if (selectedClassId.length === classes.length) {
-      onChange([]);
-    } else {
-      onChange(classes.map((cls) => cls.id));
-    }
-  };
-
-  const handleCheckboxChange = (id) => {
-    const current = selectedClassId || [];
-    if (current.includes(id)) {
-      onChange(current.filter((clsId) => clsId !== id));
-    } else {
-      onChange([...current, id]);
-    }
-  };
-
-  const handleSingleSelect = (id) => {
-    onChange(id);
-    setOpen(false);
-  };
-
-  const renderLabel = () => {
+  const handleSelect = (classId) => {
     if (multiple) {
-      if (!selectedClassId || selectedClassId.length === 0)
-        return "Pilih Kelas";
-      const selectedNames = classes
-        .filter((cls) => selectedClassId.includes(cls.id))
-        .map((cls) => cls.name);
-      return selectedNames.join(", ");
+      const current = selectedClassId || [];
+      if (current.includes(classId)) {
+        onChange(current.filter((id) => id !== classId));
+      } else {
+        onChange([...current, classId]);
+      }
     } else {
-      const selected = classes.find((cls) => cls.id === selectedClassId);
-      return selected ? selected.name : "Pilih Kelas";
+      onChange([classId]);
+      setOpen(false);
     }
+  };
+
+  const getDisplayText = () => {
+    if (!selectedClassId || selectedClassId.length === 0) return "Pilih Kelas";
+    const selectedNames = classes
+      .filter((cls) => selectedClassId.includes(cls.id))
+      .map((cls) => cls.name);
+    return selectedNames.join(", ");
   };
 
   return (
-    <div ref={dropdownRef} className="relative mb-4">
-      <label className="block mb-1 text-sm font-medium text-gray-700">
-        Kelas
+    <div className="relative" ref={containerRef}>
+      <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+        <BookOpen className="inline w-4 h-4 mr-1" />
+        Filter Kelas
       </label>
+
       <button
-        type="button"
-        onClick={toggleDropdown}
-        className="w-full flex justify-between items-center border border-gray-300 rounded px-3 py-2 bg-white hover:bg-gray-50"
+        // 🔥 pasang ref ke tombol
+        onClick={() => setOpen(!open)}
+        className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-left hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 flex items-center justify-between"
       >
-        <span className="text-sm text-gray-700">{renderLabel()}</span>
-        <ChevronDown className="w-4 h-4 text-gray-500" />
+        <span className="text-gray-400 truncate">{getDisplayText()}</span>
+        {multiple && selectedClassId?.length > 0 && (
+          <X
+            className="w-4 h-4 text-red-500 hover:text-red-700 ml-2 flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation(); // cegah toggle dropdown saat klik ikon X
+              onChange([]);
+            }}
+            title="Hapus semua filter"
+          />
+        )}
       </button>
 
       {open && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-64 overflow-y-auto">
-          {multiple ? (
-            <div className="p-2">
-              <button
-                type="button"
-                onClick={handleSelectAll}
-                className="text-sm text-blue-600 underline mb-2"
-              >
-                {selectedClassId.length === classes.length
-                  ? "Hapus Semua"
-                  : "Pilih Semua"}
-              </button>
-              {classes.map((cls) => (
-                <label
-                  key={cls.id}
-                  className="block text-sm px-2 py-1 cursor-pointer hover:bg-gray-100 rounded"
-                >
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={selectedClassId.includes(cls.id)}
-                    onChange={() => handleCheckboxChange(cls.id)}
-                  />
-                  {cls.name}
-                </label>
-              ))}
+        <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+          {classes.map((cls) => (
+            <div
+              key={cls.id}
+              onClick={() => handleSelect(cls.id)}
+              className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+            >
+              <span className="font-semibold text-gray-700">{cls.name}</span>
+              {selectedClassId?.includes(cls.id) && (
+                <span className="float-right text-blue-500">✓</span>
+              )}
             </div>
-          ) : (
-            <div className="p-2">
-              {classes.map((cls) => (
-                <div
-                  key={cls.id}
-                  className="text-sm px-2 py-1 cursor-pointer hover:bg-gray-100 rounded"
-                  onClick={() => handleSingleSelect(cls.id)}
-                >
-                  {cls.name}
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       )}
     </div>
