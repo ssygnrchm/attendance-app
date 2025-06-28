@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Users, Pencil, Trash2, Check, X } from "lucide-react";
+import {
+  Users,
+  Pencil,
+  Trash2,
+  Check,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   collection,
   getDocs,
@@ -21,6 +29,10 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
   const [classOptions, setClassOptions] = useState([]);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [studentsPerPage] = useState(10);
 
   const fetchClasses = async () => {
     const snapshot = await getDocs(collection(db, "classes"));
@@ -83,6 +95,8 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
     });
 
     setStudents(combined);
+    // Reset to first page when data changes
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -145,6 +159,52 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
     }
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil(students.length / studentsPerPage);
+  const startIndex = (currentPage - 1) * studentsPerPage;
+  const endIndex = startIndex + studentsPerPage;
+  const currentStudents = students.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Cancel any ongoing edit when changing pages
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+
+    return pages;
+  };
+
   return (
     <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden">
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b-2 border-gray-200">
@@ -162,6 +222,9 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                No
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                 Nama
               </th>
               <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
@@ -176,11 +239,14 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {students.map((student, index) => (
+            {currentStudents.map((student, index) => (
               <tr
                 key={student.id}
                 className="hover:bg-gray-50 transition-colors duration-150"
               >
+                <td className="px-6 py-4 text-sm font-medium text-gray-700">
+                  {startIndex + index + 1}
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
@@ -315,6 +381,65 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Menampilkan {startIndex + 1} -{" "}
+              {Math.min(endIndex, students.length)} dari {students.length} siswa
+            </div>
+
+            <div className="flex items-center space-x-2">
+              {/* Previous Button */}
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === 1
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <ChevronLeft size={16} className="mr-1" />
+                Sebelumnya
+              </button>
+
+              {/* Page Numbers */}
+              <div className="flex space-x-1">
+                {getPageNumbers().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              {/* Next Button */}
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === totalPages
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                Selanjutnya
+                <ChevronRight size={16} className="ml-1" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
