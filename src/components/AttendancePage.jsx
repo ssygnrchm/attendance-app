@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ClassSelector from "./students/ClassSelector";
 import DateSelector from "./attendances/DateSelector";
-import AttendanceGrid from "./attendances/AttendanceGrid";
+import AttendanceSwipeCards from "./attendances/AttendanceSwipeCards";
 import SaveAttendanceButton from "./attendances/SaveAttendanceButton";
 
 export default function AttendancePage() {
@@ -24,7 +24,7 @@ export default function AttendancePage() {
         />
       </div>
 
-      <AttendanceGrid
+      <AttendanceSwipeCards
         classId={selectedClassId[0]}
         selectedDate={selectedDate}
         attendance={attendance}
