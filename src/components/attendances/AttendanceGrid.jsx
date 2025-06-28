@@ -17,7 +17,7 @@ export default function AttendanceGrid({
   setAttendance,
 }) {
   const [students, setStudents] = useState([]);
-  const [className, setClassName] = useState("");
+  const [classLabel, setclassLabel] = useState("");
 
   useEffect(() => {
     if (!classId) return;
@@ -28,10 +28,11 @@ export default function AttendanceGrid({
         const classDocRef = doc(db, "classes", classId);
         const classDocSnap = await getDoc(classDocRef);
         if (classDocSnap.exists()) {
-          setClassName(classDocSnap.data().name);
+          console.info(classDocSnap.data().name);
+          setclassLabel(classDocSnap.data().name);
         }
       } catch (error) {
-        console.error("Error fetching class details:", error);
+        console.error("Error fetching class details: " + error);
       }
 
       // Fetch students
@@ -66,7 +67,7 @@ export default function AttendanceGrid({
   return (
     <div>
       <h3 className="text-lg font-medium mb-3">
-        Kelas: {className || classId}
+        Kelas: {classLabel || classId}
       </h3>
       <table className="w-full text-left border">
         <thead>
@@ -82,7 +83,7 @@ export default function AttendanceGrid({
               student={student}
               status={attendance[student.id] || "Present"}
               onStatusChange={handleStatusChange}
-              className={className}
+              className={classLabel}
             />
           ))}
         </tbody>

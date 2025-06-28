@@ -6,6 +6,8 @@ import { BookOpen, X } from "lucide-react";
 export default function ClassSelector({
   selectedClassId,
   onChange,
+  title,
+  isIcon = false,
   multiple = false,
 }) {
   const [classes, setClasses] = useState([]);
@@ -66,8 +68,8 @@ export default function ClassSelector({
   return (
     <div className="relative" ref={containerRef}>
       <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-        <BookOpen className="inline w-4 h-4 mr-1" />
-        Filter Kelas
+        {isIcon ? <BookOpen className="inline w-4 h-4 mr-1" /> : null}
+        {title}
       </label>
 
       <button
@@ -75,7 +77,13 @@ export default function ClassSelector({
         onClick={() => setOpen(!open)}
         className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-left hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 flex items-center justify-between"
       >
-        <span className="text-gray-400 truncate">{getDisplayText()}</span>
+        <span
+          className={`truncate ${
+            getDisplayText() != "Pilih Kelas" ? "text-black" : "text-gray-400"
+          }`}
+        >
+          {getDisplayText()}
+        </span>
         {multiple && selectedClassId?.length > 0 && (
           <X
             className="w-4 h-4 text-red-500 hover:text-red-700 ml-2 flex-shrink-0"

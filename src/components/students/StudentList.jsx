@@ -60,11 +60,26 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
       className: classMap[student.classId] || "Unknown",
     }));
 
+    // Fixed sorting: first by class name (string comparison), then by student name
     combined.sort((a, b) => {
-      const classA = parseInt(a.className);
-      const classB = parseInt(b.className);
-      if (classA !== classB) return classA - classB;
-      return a.name.localeCompare(b.name);
+      // Compare class names as strings (case-insensitive)
+      const classComparison = a.className.localeCompare(
+        b.className,
+        undefined,
+        {
+          numeric: true,
+          sensitivity: "base",
+        }
+      );
+
+      if (classComparison !== 0) {
+        return classComparison;
+      }
+
+      // If class names are the same, sort by student name
+      return a.name.localeCompare(b.name, undefined, {
+        sensitivity: "base",
+      });
     });
 
     setStudents(combined);
