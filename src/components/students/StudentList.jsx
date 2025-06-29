@@ -282,7 +282,7 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
                         }))
                       }
                       className={`inline-flex px-3 py-2 rounded-lg text-sm font-medium ${
-                        editData.gender === "Laki-laki"
+                        editData.gender === "Laki-Laki"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-pink-100 text-pink-800"
                       }`}
@@ -303,7 +303,7 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
                   ) : (
                     <span
                       className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                        student.gender === "Laki-laki"
+                        student.gender === "Laki-Laki"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-pink-100 text-pink-800"
                       }`}
