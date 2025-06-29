@@ -73,8 +73,8 @@ export default function AddStudentForm({ onStudentAdded }) {
             {gender != "" ? null : (
               <option value="">Pilih jenis kelamin</option>
             )}
-            <option value="Laki-laki" className="text-black">
-              Laki-laki
+            <option value="Laki-Laki" className="text-black">
+              Laki-Laki
             </option>
             <option value="Perempuan" className="text-black">
               Perempuan

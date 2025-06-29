@@ -248,28 +248,28 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
                   {startIndex + index + 1}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                  {/* <div className="flex items-center"> */}
+                  {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
                       {student.name.charAt(0)}
-                    </div>
-                    {editingId === student.id ? (
-                      <input
-                        type="text"
-                        value={editData.name}
-                        onChange={(e) =>
-                          setEditData((prev) => ({
-                            ...prev,
-                            name: e.target.value,
-                          }))
-                        }
-                        className="bg-gray-100 text-gray-900 font-medium px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <span className="font-medium text-gray-900">
-                        {student.name}
-                      </span>
-                    )}
-                  </div>
+                    </div> */}
+                  {editingId === student.id ? (
+                    <input
+                      type="text"
+                      value={editData.name}
+                      onChange={(e) =>
+                        setEditData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      className="bg-gray-100 text-gray-900 font-medium px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ) : (
+                    <span className="font-medium text-gray-900">
+                      {student.name}
+                    </span>
+                  )}
+                  {/* </div> */}
                 </td>
                 <td className="px-6 py-4">
                   {editingId === student.id ? (
@@ -288,10 +288,10 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
                       }`}
                     >
                       <option
-                        value="Laki-laki"
+                        value="Laki-Laki"
                         className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
                       >
-                        Laki-laki
+                        Laki-Laki
                       </option>
                       <option
                         value="Perempuan"
@@ -385,11 +385,11 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-700">
+          <div className="flex items-center justify-end">
+            {/* <div className="text-sm text-gray-700">
               Menampilkan {startIndex + 1} -{" "}
               {Math.min(endIndex, students.length)} dari {students.length} siswa
-            </div>
+            </div> */}
 
             <div className="flex items-center space-x-2">
               {/* Previous Button */}
@@ -403,7 +403,7 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
                 }`}
               >
                 <ChevronLeft size={16} className="mr-1" />
-                Sebelumnya
+                {/* Sebelumnya */}
               </button>
 
               {/* Page Numbers */}
@@ -433,7 +433,7 @@ export default function StudentList({ classIds = [], searchKeyword = "" }) {
                     : "text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                Selanjutnya
+                {/* Selanjutnya */}
                 <ChevronRight size={16} className="ml-1" />
               </button>
             </div>
