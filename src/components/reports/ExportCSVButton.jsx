@@ -9,10 +9,13 @@ export default function ExportCSVButton({ data, month }) {
     setLoading(true);
     setSuccess(false);
     try {
-      const response = await axios.post("http://localhost:5000/export", {
-        data,
-        month,
-      });
+      const response = await axios.post(
+        "https://attendance-backend-production-f82b.up.railway.app/export",
+        {
+          data,
+          month,
+        }
+      );
       alert(response.data.message);
       setSuccess(true);
     } catch (err) {
