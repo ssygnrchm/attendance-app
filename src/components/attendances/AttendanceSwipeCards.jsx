@@ -31,11 +31,11 @@ export default function AttendanceSwipeCards({
   const [classLabel, setClassLabel] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+  // const [isDragging, setIsDragging] = useState(false);
   const [completedStudents, setCompletedStudents] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const cardRef = useRef(null);
-  const startPosRef = useRef({ x: 0, y: 0 });
+  // const startPosRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!classId) return;
@@ -148,74 +148,74 @@ export default function AttendanceSwipeCards({
     }
   };
 
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    startPosRef.current = { x: e.clientX, y: e.clientY };
-  };
+  // const handleMouseDown = (e) => {
+  //   setIsDragging(true);
+  //   startPosRef.current = { x: e.clientX, y: e.clientY };
+  // };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
+  // const handleMouseMove = (e) => {
+  //   if (!isDragging) return;
 
-    const deltaX = e.clientX - startPosRef.current.x;
-    const deltaY = e.clientY - startPosRef.current.y;
-    setDragOffset({ x: deltaX, y: deltaY });
-  };
+  //   const deltaX = e.clientX - startPosRef.current.x;
+  //   const deltaY = e.clientY - startPosRef.current.y;
+  //   setDragOffset({ x: deltaX, y: deltaY });
+  // };
 
-  const handleMouseUp = () => {
-    if (!isDragging) return;
+  // const handleMouseUp = () => {
+  //   if (!isDragging) return;
 
-    const threshold = 100;
-    const { x, y } = dragOffset;
+  //   const threshold = 100;
+  //   const { x, y } = dragOffset;
 
-    if (Math.abs(x) > threshold || Math.abs(y) > threshold) {
-      if (Math.abs(x) > Math.abs(y)) {
-        // Horizontal swipe
-        if (x > 0) {
-          handleSwipe("right", "Present");
-        } else {
-          handleSwipe("left", "Excused");
-        }
-      } else {
-        // Vertical swipe
-        if (y > 0) {
-          handleSwipe("down", "Absent");
-        }
-      }
-    } else {
-      setDragOffset({ x: 0, y: 0 });
-    }
+  //   if (Math.abs(x) > threshold || Math.abs(y) > threshold) {
+  //     if (Math.abs(x) > Math.abs(y)) {
+  //       // Horizontal swipe
+  //       if (x > 0) {
+  //         handleSwipe("right", "Present");
+  //       } else {
+  //         handleSwipe("left", "Excused");
+  //       }
+  //     } else {
+  //       // Vertical swipe
+  //       if (y > 0) {
+  //         handleSwipe("down", "Absent");
+  //       }
+  //     }
+  //   } else {
+  //     setDragOffset({ x: 0, y: 0 });
+  //   }
 
-    setIsDragging(false);
-  };
+  //   setIsDragging(false);
+  // };
 
-  const handleTouchStart = (e) => {
-    setIsDragging(true);
-    const touch = e.touches[0];
-    startPosRef.current = { x: touch.clientX, y: touch.clientY };
-  };
+  // const handleTouchStart = (e) => {
+  //   setIsDragging(true);
+  //   const touch = e.touches[0];
+  //   startPosRef.current = { x: touch.clientX, y: touch.clientY };
+  // };
 
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
+  // const handleTouchMove = (e) => {
+  //   if (!isDragging) return;
 
-    const touch = e.touches[0];
-    const deltaX = touch.clientX - startPosRef.current.x;
-    const deltaY = touch.clientY - startPosRef.current.y;
-    setDragOffset({ x: deltaX, y: deltaY });
-  };
+  //   const touch = e.touches[0];
+  //   const deltaX = touch.clientX - startPosRef.current.x;
+  //   const deltaY = touch.clientY - startPosRef.current.y;
+  //   setDragOffset({ x: deltaX, y: deltaY });
+  // };
 
-  const handleTouchEnd = () => {
-    handleMouseUp();
-  };
+  // const handleTouchEnd = () => {
+  //   handleMouseUp();
+  // };
 
-  const getCardStyle = () => {
-    const { x, y } = dragOffset;
-    const rotation = x * 0.1;
+  // const getCardStyle = () => {
+  //   const { x, y } = dragOffset;
+  //   const rotation = x * 0.1;
 
-    return {
-      transform: `translate(${x}px, ${y}px) rotate(${rotation}deg)`,
-      transition: isDragging ? "none" : "transform 0.3s ease-out",
-    };
-  };
+  //   return {
+  //     transform: `translate(${x}px, ${y}px) rotate(${rotation}deg)`,
+  //     transition: isDragging ? "none" : "transform 0.3s ease-out",
+  //   };
+  // };
 
   const getSwipeIndicator = () => {
     const { x, y } = dragOffset;
@@ -243,30 +243,30 @@ export default function AttendanceSwipeCards({
   const allRecorded = unrecordedCount === 0;
 
   return (
-    <div className="flex flex-col items-center space-y-6 p-6">
+    <div className="flex flex-col items-center space-y-6 ">
       {/* Header */}
-      <div className="text-center">
-        <h3 className="text-xl font-bold text-gray-800 mb-2">
+      <div className="text-center bg-gray-50 rounded-2xl border-2 border-gray-200 w-80 py-1">
+        <h3 className="text-xl font-bold text-gray-800 ">
           Kelas: {classLabel || classId}
         </h3>
-        <div className="text-sm text-gray-600">
+        {/* <div className="text-sm text-gray-600">
           {completedStudents} dari {students.length} siswa
           {unrecordedCount > 0 && (
             <span className="text-yellow-600 ml-2">
               ({unrecordedCount} belum dicatat)
             </span>
           )}
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+        </div> */}
+        {/* <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
           <div
             className="bg-blue-500 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(completedStudents / students.length) * 100}%` }}
           ></div>
-        </div>
+        </div> */}
       </div>
 
       {/* Instructions */}
-      <div className="bg-blue-50 rounded-lg p-4 text-center">
+      {/* <div className="bg-blue-50 rounded-lg p-4 text-center">
         <div className="flex justify-center space-x-6 text-sm">
           <div className="flex items-center space-x-2">
             <ArrowRight className="w-4 h-4 text-green-500" />
@@ -281,7 +281,7 @@ export default function AttendanceSwipeCards({
             <span>Swipe Down: Absen</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Navigation Buttons */}
       {!isCompleted && (
@@ -296,11 +296,29 @@ export default function AttendanceSwipeCards({
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Previous</span>
+            {/* <span>Previous</span> */}
           </button>
 
-          <div className="text-sm text-gray-600 px-4">
+          {/* <div className="text-sm text-gray-600 px-4">
             {currentIndex + 1} / {students.length}
+          </div> */}
+          <div className="text-center">
+            <div className="text-sm text-gray-600 px-4">
+              {currentIndex + 1} / {students.length}
+              {unrecordedCount > 0 && (
+                <span className="text-yellow-600 ml-2">
+                  ({unrecordedCount} belum dicatat)
+                </span>
+              )}
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: `${((currentIndex + 1) / students.length) * 100}%`,
+                }}
+              ></div>
+            </div>
           </div>
 
           <button
@@ -312,7 +330,7 @@ export default function AttendanceSwipeCards({
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            <span>Next</span>
+            {/* <span>Next</span> */}
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -332,10 +350,6 @@ export default function AttendanceSwipeCards({
             <ChevronLeft className="w-4 h-4" />
             <span>Previous</span>
           </button>
-
-          {/* <div className="text-sm text-gray-600 px-4">
-            {currentIndex + 1} / {students.length}
-          </div> */}
         </div>
       )}
 
@@ -420,17 +434,17 @@ export default function AttendanceSwipeCards({
                   ? "border-red-400"
                   : ""
               }`}
-              style={getCardStyle()}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
+              // style={getCardStyle()}
+              // onMouseDown={handleMouseDown}
+              // onMouseMove={handleMouseMove}
+              // onMouseUp={handleMouseUp}
+              // onMouseLeave={handleMouseUp}
+              // onTouchStart={handleTouchStart}
+              // onTouchMove={handleTouchMove}
+              // onTouchEnd={handleTouchEnd}
             >
               {/* Swipe Indicators */}
-              {swipeIndicator === "present" && (
+              {/* {swipeIndicator === "present" && (
                 <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   HADIR
                 </div>
@@ -444,7 +458,7 @@ export default function AttendanceSwipeCards({
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   ABSEN
                 </div>
-              )}
+              )} */}
 
               <div className="p-6 h-full flex flex-col justify-center items-center text-center">
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-6 flex items-center justify-center">
