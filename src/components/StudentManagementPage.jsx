@@ -23,7 +23,7 @@ export default function StudentManagementPage() {
 
   return (
     <div className="min-h-screen bg-white shadow rounded-xl p-6">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-7xl">
         {/* Header */}
         <div className="text-start mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-800 to-indigo-400 bg-clip-text text-transparent">

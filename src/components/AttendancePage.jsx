@@ -5,8 +5,12 @@ import AttendanceSwipeCards from "./attendances/AttendanceSwipeCards";
 import SaveAttendanceButton from "./attendances/SaveAttendanceButton";
 
 export default function AttendancePage() {
-  const [selectedClassId, setSelectedClassId] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState("");
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [attendance, setAttendance] = useState({});
 
   return (
@@ -25,17 +29,17 @@ export default function AttendancePage() {
       </div>
 
       <AttendanceSwipeCards
-        classId={selectedClassId[0]}
+        classId={selectedClassId}
         selectedDate={selectedDate}
         attendance={attendance}
         setAttendance={setAttendance}
       />
 
-      <SaveAttendanceButton
+      {/* <SaveAttendanceButton
         selectedDate={selectedDate}
         classId={selectedClassId}
         attendance={attendance}
-      />
+      /> */}
     </div>
   );
 }

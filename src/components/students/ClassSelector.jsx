@@ -52,7 +52,7 @@ export default function ClassSelector({
         onChange([...current, classId]);
       }
     } else {
-      onChange([classId]);
+      onChange(classId);
       setOpen(false);
     }
   };

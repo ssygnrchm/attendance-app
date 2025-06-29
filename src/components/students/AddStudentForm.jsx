@@ -87,6 +87,7 @@ export default function AddStudentForm({ onStudentAdded }) {
             selectedClassId={classId}
             onChange={setClassId}
             title={"Kelas"}
+            multiple={false}
           />
         </div>
 

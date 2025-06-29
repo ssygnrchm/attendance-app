@@ -6,6 +6,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import {
@@ -15,6 +16,9 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+  Save,
 } from "lucide-react";
 
 export default function AttendanceSwipeCards({
@@ -29,6 +33,7 @@ export default function AttendanceSwipeCards({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [completedStudents, setCompletedStudents] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
   const cardRef = useRef(null);
   const startPosRef = useRef({ x: 0, y: 0 });
 
@@ -60,10 +65,12 @@ export default function AttendanceSwipeCards({
       setCurrentIndex(0);
       setCompletedStudents(0);
 
-      // Initialize attendance with default "Present" status
+      // Initialize attendance without default status
       const defaultAttendance = {};
       list.forEach((s) => {
-        defaultAttendance[s.id] = attendance[s.id] || "Present";
+        if (attendance[s.id]) {
+          defaultAttendance[s.id] = attendance[s.id];
+        }
       });
       setAttendance(defaultAttendance);
     };
@@ -83,6 +90,62 @@ export default function AttendanceSwipeCards({
     setCurrentIndex((prev) => prev + 1);
     setCompletedStudents((prev) => prev + 1);
     setDragOffset({ x: 0, y: 0 });
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+      setCompletedStudents((prev) => prev - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < students.length - 1) {
+      // Just move to next student without changing attendance
+      setCurrentIndex((prev) => prev + 1);
+      setCompletedStudents((prev) => prev + 1);
+    }
+  };
+
+  const handleSaveAttendance = async () => {
+    if (!selectedDate || !classId) {
+      alert("Tanggal dan kelas harus dipilih");
+      return;
+    }
+
+    // Check if all students have recorded attendance
+    const unrecordedStudents = students.filter(
+      (student) => !attendance[student.id]
+    );
+    if (unrecordedStudents.length > 0) {
+      const unrecordedNames = unrecordedStudents.map((s) => s.name).join(", ");
+      alert(
+        `Masih ada ${unrecordedStudents.length} siswa yang belum dicatat kehadirannya: ${unrecordedNames}`
+      );
+      return;
+    }
+
+    setIsSaving(true);
+
+    const record = {
+      date: selectedDate,
+      classId: classId,
+      records: Object.entries(attendance).map(([studentId, status]) => ({
+        studentId,
+        status,
+      })),
+    };
+
+    const docId = `${classId}_${selectedDate}`;
+    try {
+      await setDoc(doc(db, "attendanceRecords", docId), record);
+      alert("Absensi berhasil disimpan!");
+    } catch (error) {
+      console.error("Gagal menyimpan absensi:", error);
+      alert("Terjadi kesalahan saat menyimpan.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleMouseDown = (e) => {
@@ -173,6 +236,12 @@ export default function AttendanceSwipeCards({
   const isCompleted = currentIndex >= students.length;
   const swipeIndicator = getSwipeIndicator();
 
+  // Check if all students have recorded attendance
+  const unrecordedCount = students.filter(
+    (student) => !attendance[student.id]
+  ).length;
+  const allRecorded = unrecordedCount === 0;
+
   return (
     <div className="flex flex-col items-center space-y-6 p-6">
       {/* Header */}
@@ -182,6 +251,11 @@ export default function AttendanceSwipeCards({
         </h3>
         <div className="text-sm text-gray-600">
           {completedStudents} dari {students.length} siswa
+          {unrecordedCount > 0 && (
+            <span className="text-yellow-600 ml-2">
+              ({unrecordedCount} belum dicatat)
+            </span>
+          )}
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
           <div
@@ -209,15 +283,110 @@ export default function AttendanceSwipeCards({
         </div>
       </div>
 
+      {/* Navigation Buttons */}
+      {!isCompleted && (
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+              currentIndex === 0
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Previous</span>
+          </button>
+
+          <div className="text-sm text-gray-600 px-4">
+            {currentIndex + 1} / {students.length}
+          </div>
+
+          <button
+            onClick={handleNext}
+            disabled={currentIndex >= students.length - 1}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+              currentIndex >= students.length - 1
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
+          >
+            <span>Next</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {isCompleted && (
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+              currentIndex === 0
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Previous</span>
+          </button>
+
+          {/* <div className="text-sm text-gray-600 px-4">
+            {currentIndex + 1} / {students.length}
+          </div> */}
+        </div>
+      )}
+
       {/* Card Stack */}
       <div className="relative w-80 h-96">
         {isCompleted ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-green-50 rounded-2xl border-2 border-green-200">
-            <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-            <h3 className="text-xl font-bold text-green-700 mb-2">Selesai!</h3>
-            <p className="text-green-600 text-center">
-              Absensi untuk {students.length} siswa telah dicatat
-            </p>
+            {allRecorded && (
+              <div className="flex flex-col items-center justify-center">
+                <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+                <h3 className="text-xl font-bold text-green-700 mb-2">
+                  Selesai!
+                </h3>
+                <p className="text-green-600 text-center mb-2">
+                  Absensi untuk {students.length} siswa telah dicatat
+                </p>
+              </div>
+            )}
+
+            {/* Show warning if not all students are recorded */}
+            {!allRecorded && (
+              <div className="flex flex-col items-center justify-center">
+                <XCircle className="w-16 h-16 text-yellow-500 mb-4" />
+                {/* <h3 className="text-xl font-bold text-green-700 mb-2">
+                  Selesai!
+                </h3> */}
+                <p className="text-yellow-600 text-center mb-4 text-sm">
+                  Masih ada {unrecordedCount} siswa yang belum dicatat
+                </p>
+              </div>
+            )}
+
+            {/* Auto Save Button */}
+            <button
+              onClick={handleSaveAttendance}
+              disabled={isSaving || !allRecorded}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                isSaving || !allRecorded
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600"
+              } text-white`}
+            >
+              <Save className="w-5 h-5" />
+              <span>
+                {isSaving
+                  ? "Menyimpan..."
+                  : !allRecorded
+                  ? "Lengkapi semua absensi"
+                  : "Simpan Absensi"}
+              </span>
+            </button>
           </div>
         ) : (
           <>
@@ -288,9 +457,35 @@ export default function AttendanceSwipeCards({
                   {currentStudent?.name}
                 </h3>
 
-                <p className="text-gray-600 mb-6">
+                {/* <p className="text-gray-600 mb-4">
                   NIS: {currentStudent?.studentId || "N/A"}
-                </p>
+                </p> */}
+
+                {/* Show current attendance status */}
+                <div className="mb-4">
+                  <span className="text-sm text-gray-500">
+                    Status saat ini:{" "}
+                  </span>
+                  <span
+                    className={`font-semibold ${
+                      !attendance[currentStudent?.id]
+                        ? "text-gray-500"
+                        : attendance[currentStudent?.id] === "Present"
+                        ? "text-green-600"
+                        : attendance[currentStudent?.id] === "Excused"
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {!attendance[currentStudent?.id]
+                      ? "Belum dicatat"
+                      : attendance[currentStudent?.id] === "Present"
+                      ? "Hadir"
+                      : attendance[currentStudent?.id] === "Excused"
+                      ? "Izin"
+                      : "Absen"}
+                  </span>
+                </div>
 
                 <div className="text-sm text-gray-500">
                   Geser kartu untuk mencatat kehadiran

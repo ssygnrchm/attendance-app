@@ -1,4 +1,11 @@
 export default function DateSelector({ selectedDate, onChange }) {
+  // Fungsi helper untuk mendapatkan tanggal hari ini dalam format YYYY-MM-DD
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+  // onChange(getTodayDate());
+
   return (
     <div className="w-full">
       <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
