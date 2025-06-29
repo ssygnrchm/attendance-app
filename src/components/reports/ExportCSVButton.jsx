@@ -4,18 +4,16 @@ import { useState } from "react";
 export default function ExportCSVButton({ data, month }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const handleExport = async () => {
     setLoading(true);
     setSuccess(false);
     try {
-      const response = await axios.post(
-        "https://attendance-backend-production-f82b.up.railway.app/export",
-        {
-          data,
-          month,
-        }
-      );
+      const response = await axios.post(BACKEND_URL, {
+        data,
+        month,
+      });
       alert(response.data.message);
       setSuccess(true);
     } catch (err) {
