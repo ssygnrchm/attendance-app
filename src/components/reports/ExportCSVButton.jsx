@@ -4,8 +4,9 @@ import { useState } from "react";
 export default function ExportCSVButton({ data, month }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-  const export_url = BACKEND_URL + "/export";
+
+  // URL ke serverless function Netlify
+  const export_url = "/.netlify/functions/export";
 
   const handleExport = async () => {
     setLoading(true);

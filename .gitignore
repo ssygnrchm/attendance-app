@@ -10,15 +10,20 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+service-account.json
 *.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
+.env
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Local Netlify folder
+.netlify
