@@ -3,7 +3,11 @@ const { google } = require("googleapis");
 // const path = require("path");
 const fs = require("fs");
 
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+// const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+
+const base64 = process.env.GOOGLE_SERVICE_ACCOUNT_BASE64;
+const jsonString = Buffer.from(base64, 'base64').toString('utf-8');
+const credentials = JSON.parse(jsonString);
 
 const auth = new google.auth.GoogleAuth({
   credentials,
